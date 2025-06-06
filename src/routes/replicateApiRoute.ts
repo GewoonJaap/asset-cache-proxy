@@ -32,8 +32,9 @@ ReplicateApiRoute.get('/:key1/:key2/:key3', async (c) => {
     }
     // Store in R2
     const contentType = response.headers.get('Content-Type') || 'video/mp4';
-    await r2.uploadObject(r2Key, response.body, contentType);
-    return c.newResponse(response.body, {
+    const arrayBuffer = await response.arrayBuffer();
+    await r2.uploadObject(r2Key, arrayBuffer, contentType);
+    return c.newResponse(arrayBuffer, {
       status: 200,
       headers: {
         'Content-Type': contentType,
