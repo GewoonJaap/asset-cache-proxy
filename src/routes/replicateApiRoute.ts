@@ -3,7 +3,7 @@ import { R2Helper } from "./R2Helper";
 
 export const ReplicateApiRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
-ReplicateApiRoute.get('/replicate/:key1/:key2/:key3', async (c) => {
+ReplicateApiRoute.get('/:key1/:key2/:key3', async (c) => {
   const { key1, key2, key3 } = c.req.param();
   // @ts-ignore
   const r2 = new R2Helper(c.env.MEDIA_BUCKET);
