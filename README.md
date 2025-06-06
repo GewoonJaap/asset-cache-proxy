@@ -66,3 +66,4 @@ GET /api/replicate/xezq/IjJpp5sfup1wFinC840xiwvRHO06E2seo3ZG1J4J5aolPE0UA/tmpcpj
   ```ts
   // src/index.ts
   const app = new Hono<{ Bindings: CloudflareBindings }>()
+```
