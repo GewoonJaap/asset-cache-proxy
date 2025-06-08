@@ -3,7 +3,7 @@ import { R2Helper } from "./R2Helper";
 
 export const ReplicateApiRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
-ReplicateApiRoute.get('/:key1/:key2/:key3', async (c) => {
+ReplicateApiRoute.get("/:key1/:key2/:key3", async (c) => {
   const { key1, key2, key3 } = c.req.param();
   // @ts-ignore
   const r2 = new R2Helper(c.env.MEDIA_BUCKET);
@@ -15,10 +15,10 @@ ReplicateApiRoute.get('/:key1/:key2/:key3', async (c) => {
     return c.newResponse(cached.body, {
       status: 200,
       headers: {
-        'Content-Type': cached.httpMetadata?.contentType || 'video/mp4',
-        'Cache-Control': 'public, max-age=31536000',
-        'X-R2-Cache': 'HIT',
-      },
+        "Content-Type": cached.httpMetadata?.contentType || "video/mp4",
+        "Cache-Control": "public, max-age=31536000",
+        "X-R2-Cache": "HIT"
+      }
     });
   }
 
@@ -31,16 +31,16 @@ ReplicateApiRoute.get('/:key1/:key2/:key3', async (c) => {
       return c.text(`Failed to fetch video: ${response.statusText}`, response.status);
     }
     // Store in R2
-    const contentType = response.headers.get('Content-Type') || 'video/mp4';
+    const contentType = response.headers.get("Content-Type") || "video/mp4";
     const arrayBuffer = await response.arrayBuffer();
     await r2.uploadObject(r2Key, arrayBuffer, contentType);
     return c.newResponse(arrayBuffer, {
       status: 200,
       headers: {
-        'Content-Type': contentType,
-        'Cache-Control': 'public, max-age=31536000',
-        'X-R2-Cache': 'MISS',
-      },
+        "Content-Type": contentType,
+        "Cache-Control": "public, max-age=31536000",
+        "X-R2-Cache": "MISS"
+      }
     });
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error);

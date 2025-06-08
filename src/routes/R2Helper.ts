@@ -1,4 +1,3 @@
-
 export class R2Helper {
   private bucket: R2Bucket;
 
@@ -6,9 +5,13 @@ export class R2Helper {
     this.bucket = bucket;
   }
 
-  async uploadObject(key: string, body: ReadableStream | ArrayBuffer | string, contentType = 'application/octet-stream') {
+  async uploadObject(
+    key: string,
+    body: ReadableStream | ArrayBuffer | string,
+    contentType = "application/octet-stream"
+  ) {
     await this.bucket.put(key, body, {
-      httpMetadata: { contentType },
+      httpMetadata: { contentType }
     });
   }
 

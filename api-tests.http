@@ -1,0 +1,38 @@
+@hostname = http://127.0.0.1:8787
+
+###
+# Generate image with Stable Diffusion
+# @name stableDiffusionPost
+POST {{hostname}}/api/cf/text-to-image
+Content-Type: application/json
+
+{
+  "model": "stable-diffusion",
+  "prompt": "A futuristic cityscape at sunset",
+  "num_steps": 20,
+  "width": 1024,
+  "height": 1024
+}
+
+###
+# Retrieve Stable Diffusion Image
+# @prompt imageIdStableDiffusion Please enter the imageId from the Stable Diffusion POST response:
+GET {{hostname}}/api/cf/text-to-image/{{imageIdStableDiffusion}}
+
+
+###
+# Generate image with Flux Schnell
+# @name fluxSchnellPost
+POST {{hostname}}/api/cf/text-to-image
+Content-Type: application/json
+
+{
+  "model": "flux-schnell",
+  "prompt": "A cute cat wearing a party hat",
+  "steps": 4
+}
+
+###
+# Retrieve Flux Schnell Image
+# @prompt imageIdFluxSchnell Please enter the imageId from the Flux Schnell POST response:
+GET {{hostname}}/api/cf/text-to-image/{{imageIdFluxSchnell}}

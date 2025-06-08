@@ -3,5 +3,6 @@ declare namespace Cloudflare {
         }
 }
 interface CloudflareBindings extends Cloudflare.Env {
-    MEDIA_BUCKET: R2Bucket
+    MEDIA_BUCKET: R2Bucket;
+    AI: Ai;
 }
