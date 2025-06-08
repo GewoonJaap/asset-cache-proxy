@@ -36,3 +36,24 @@ Content-Type: application/json
 # Retrieve Flux Schnell Image
 # @prompt imageIdFluxSchnell Please enter the imageId from the Flux Schnell POST response:
 GET {{hostname}}/api/cf/text-to-image/{{imageIdFluxSchnell}}
+
+
+###
+# Cloudflare Text-to-Speech
+###
+
+# @name Generate Speech (CF TTS)
+POST {{baseUrl}}/api/cf/text-to-speech
+Content-Type: application/json
+X-Auth-Guid: {{authGuid}}
+
+{
+    "prompt": "Hello from Hono and Cloudflare Workers! This is a text-to-speech test.",
+    "lang": "en-US"
+}
+
+###
+# @name Get Speech Audio (CF TTS)
+# @prompt audioId Enter the Audio ID from the generation step
+GET {{baseUrl}}/api/cf/text-to-speech/{{audioId}}
+X-Auth-Guid: {{authGuid}}

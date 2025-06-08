@@ -1,4 +1,4 @@
-import { R2Helper } from "../routes/R2Helper";
+import { R2Helper } from "./R2Helper";
 import { v4 as uuidv4 } from "uuid";
 
 // Re-define or import supportedModels and ModelName if they are not passed directly
@@ -21,10 +21,18 @@ export interface GenerateImageResult {
 export class CfTextToImageService {
   private r2: R2Helper;
   private env: CloudflareBindings;
+  private aiGatewayConfig: { gateway: { id: string; skipCache: boolean; cacheTtl: number } };
 
   constructor(env: CloudflareBindings) {
     this.env = env;
     this.r2 = new R2Helper(env.MEDIA_BUCKET);
+    this.aiGatewayConfig = {
+      gateway: {
+        id: env.AI_GATEWAY_ID,
+        skipCache: false,
+        cacheTtl: 3600 // Cache for 1 hour, adjust as needed
+      }
+    };
   }
 
   async generateAndStoreImage(modelName: ModelName, inputs: Record<string, any>): Promise<GenerateImageResult> {
@@ -34,7 +42,8 @@ export class CfTextToImageService {
     }
 
     const imageId = uuidv4();
-    const aiResponse = await this.env.AI.run(modelId, inputs);
+    // Pass the AI Gateway configuration to the AI.run method
+    const aiResponse = await this.env.AI.run(modelId, inputs, this.aiGatewayConfig);
 
     let imageBody: ArrayBuffer;
     let contentType: string;
@@ -80,7 +89,7 @@ export class CfTextToImageService {
     };
   }
 
-  async retrieveImageFromR2(imageId: string): Promise<R2ObjectBody | null> {
+  async retrieveImageFromR2(imageId: string): Promise<R2ObjRectBody | null> {
     if (!imageId) {
       throw new Error("Image ID is required for retrieval");
     }

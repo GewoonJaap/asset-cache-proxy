@@ -6,6 +6,7 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 - **Proxy and cache for Google Gemini API video assets**
 - **Proxy and cache for Replicate.com video assets**
 - **Cloudflare AI Text-to-Image generation with R2 caching** (Supports Stable Diffusion & Flux Schnell)
+- **Cloudflare AI Text-to-Speech with R2 caching**
 - **Persistent storage using Cloudflare R2**
 - **Automatic cache lookup and population**
 - **Fast delivery for repeated requests (cache hits)**
@@ -15,6 +16,7 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 - If found, the asset is served directly from R2 (cache hit).
 - If not found, the Worker fetches the asset from the upstream API, stores it in R2, and then serves it to the client (cache miss).
 - For Cloudflare Text-to-Image, the image is generated, stored in R2, and an image ID is returned. The image can then be retrieved via its ID.
+- For Cloudflare Text-to-Speech, the audio is generated from text, stored in R2, and an audio ID is returned. The audio can then be retrieved via its ID.
 
 ## Endpoints
 
@@ -30,6 +32,13 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
   - Request Body: `{ "model": "stable-diffusion" | "flux-schnell", "prompt": "your prompt", ...other_model_params }`
   - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
 - `GET /api/cf/text-to-image/:imageId` - Retrieves a previously generated image by its ID.
+  - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
+
+### Cloudflare Text-to-Speech (TTS)
+- `POST /api/cf/text-to-speech` - Generates audio from text and returns an audio ID.
+  - Request Body: `{ "prompt": "your text", "lang": "en-US" }`
+  - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
+- `GET /api/cf/text-to-speech/:audioId` - Retrieves a previously generated audio file by its ID.
   - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
 
 ## Usage
@@ -64,6 +73,12 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 - For local development, create a `.dev.vars` file in the project root and add `AUTH_GUID="YOUR_CHOSEN_GUID"`.
 - Include the header `X-Auth-Guid` with your configured GUID in requests to these endpoints.
 
+### Text-to-Speech Authentication
+- The `/api/cf/text-to-speech/*` routes require authentication.
+- You must set a secret named `AUTH_GUID` in your Cloudflare Worker environment variables (Settings > Variables > Add variable, then encrypt it).
+- For local development, create a `.dev.vars` file in the project root and add `AUTH_GUID="YOUR_CHOSEN_GUID"`.
+- Include the header `X-Auth-Guid` with your configured GUID in requests to these endpoints.
+
 ## Example Request
 
 **Gemini/Replicate:**
@@ -89,11 +104,29 @@ GET /api/cf/text-to-image/your-generated-image-id
 X-Auth-Guid: YOUR_AUTH_GUID
 ```
 
+**Cloudflare Text-to-Speech (Authenticated):**
+```http
+POST /api/cf/text-to-speech
+Content-Type: application/json
+X-Auth-Guid: YOUR_AUTH_GUID
+
+{
+  "prompt": "Hello, this is a test of the text-to-speech service.",
+  "lang": "en-US"
+}
+```
+
+```http
+GET /api/cf/text-to-speech/your-generated-audio-id
+X-Auth-Guid: YOUR_AUTH_GUID
+```
+
 ## Project Structure
 - `src/index.ts` – Main entry point, route registration, and authentication middleware.
 - `src/routes/geminiApiRoute.ts` – Handles Gemini API proxying and caching.
 - `src/routes/replicateApiRoute.ts` – Handles Replicate.com proxying and caching.
 - `src/routes/cfTextToImageRoute.ts` – Handles Cloudflare AI Text-to-Image generation and retrieval.
+- `src/routes/cfTextToSpeechRoute.ts` – Handles Cloudflare AI Text-to-Speech generation and retrieval.
 - `src/routes/R2Helper.ts` – Helper for R2 storage operations.
 
 ## Notes

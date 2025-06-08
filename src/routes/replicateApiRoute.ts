@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { R2Helper } from "./R2Helper";
+import { R2Helper } from "../services/R2Helper";
 
 export const ReplicateApiRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
