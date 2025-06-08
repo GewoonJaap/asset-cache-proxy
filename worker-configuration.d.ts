@@ -5,4 +5,5 @@ declare namespace Cloudflare {
 interface CloudflareBindings extends Cloudflare.Env {
     MEDIA_BUCKET: R2Bucket;
     AI: Ai;
+    AUTH_GUID: string; // Added for authentication
 }

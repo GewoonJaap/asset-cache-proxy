@@ -5,6 +5,7 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 ## Features
 - **Proxy and cache for Google Gemini API video assets**
 - **Proxy and cache for Replicate.com video assets**
+- **Cloudflare AI Text-to-Image generation with R2 caching** (Supports Stable Diffusion & Flux Schnell)
 - **Persistent storage using Cloudflare R2**
 - **Automatic cache lookup and population**
 - **Fast delivery for repeated requests (cache hits)**
@@ -13,6 +14,7 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 - When a request is made for a Gemini or Replicate asset, the Worker first checks the R2 bucket for a cached copy.
 - If found, the asset is served directly from R2 (cache hit).
 - If not found, the Worker fetches the asset from the upstream API, stores it in R2, and then serves it to the client (cache miss).
+- For Cloudflare Text-to-Image, the image is generated, stored in R2, and an image ID is returned. The image can then be retrieved via its ID.
 
 ## Endpoints
 
@@ -22,6 +24,13 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 
 ### Replicate.com
 - `GET /api/replicate/:key1/:key2/:key3`
+
+### Cloudflare Text-to-Image (Authentication Required)
+- `POST /api/cf/text-to-image` - Generates an image and returns an image ID.
+  - Request Body: `{ "model": "stable-diffusion" | "flux-schnell", "prompt": "your prompt", ...other_model_params }`
+  - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
+- `GET /api/cf/text-to-image/:imageId` - Retrieves a previously generated image by its ID.
+  - Headers: `X-Auth-Guid: YOUR_AUTH_GUID`
 
 ## Usage
 
@@ -45,25 +54,50 @@ A Cloudflare Worker proxy that caches assets from the Google Gemini API and Repl
 ## Configuration
 
 - The R2 bucket binding is defined in `wrangler.toml` as `MEDIA_BUCKET`.
+- The AI binding for Cloudflare Text-to-Image is defined in `wrangler.toml` as `AI`.
 - You must have a Cloudflare account and an R2 bucket set up. Update the `bucket_name` in `wrangler.toml` as needed.
 - API keys for Gemini and Replicate are passed as part of the request path.
 
+### Text-to-Image Authentication
+- The `/api/cf/text-to-image/*` routes require authentication.
+- You must set a secret named `AUTH_GUID` in your Cloudflare Worker environment variables (Settings > Variables > Add variable, then encrypt it).
+- For local development, create a `.dev.vars` file in the project root and add `AUTH_GUID="YOUR_CHOSEN_GUID"`.
+- Include the header `X-Auth-Guid` with your configured GUID in requests to these endpoints.
+
 ## Example Request
 
+**Gemini/Replicate:**
 ```
 GET /api/gemini/veo/VIDEO_ID/API_KEY
 GET /api/replicate/xezq/IjJpp5sfup1wFinC840xiwvRHO06E2seo3ZG1J4J5aolPE0UA/tmpcpjkrycc.mp4
 ```
 
+**Cloudflare Text-to-Image (Authenticated):**
+```http
+POST /api/cf/text-to-image
+Content-Type: application/json
+X-Auth-Guid: YOUR_AUTH_GUID
+
+{
+  "model": "stable-diffusion",
+  "prompt": "A beautiful sunset over mountains"
+}
+```
+
+```http
+GET /api/cf/text-to-image/your-generated-image-id
+X-Auth-Guid: YOUR_AUTH_GUID
+```
+
 ## Project Structure
-- `src/routes/geminiApiRoute.ts` – Handles Gemini API proxying and caching
-- `src/routes/replicateApiRoute.ts` – Handles Replicate.com proxying and caching
-- `src/routes/R2Helper.ts` – Helper for R2 storage operations
-- `src/index.ts` – Main entry point and route registration
+- `src/index.ts` – Main entry point, route registration, and authentication middleware.
+- `src/routes/geminiApiRoute.ts` – Handles Gemini API proxying and caching.
+- `src/routes/replicateApiRoute.ts` – Handles Replicate.com proxying and caching.
+- `src/routes/cfTextToImageRoute.ts` – Handles Cloudflare AI Text-to-Image generation and retrieval.
+- `src/routes/R2Helper.ts` – Helper for R2 storage operations.
 
 ## Notes
 - Pass the `CloudflareBindings` as generics when instantiating `Hono`:
   ```ts
   // src/index.ts
   const app = new Hono<{ Bindings: CloudflareBindings }>()
-  ```

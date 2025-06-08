@@ -1,0 +1,5 @@
+# This is an example .dev.vars file for local development.
+# Copy this to .dev.vars and fill in your actual values.
+# Do NOT commit your actual .dev.vars file to version control if it contains sensitive information.
+
+AUTH_GUID="YOUR_SECRET_AUTHENTICATION_GUID_HERE"
