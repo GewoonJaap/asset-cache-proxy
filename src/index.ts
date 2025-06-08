@@ -15,7 +15,6 @@ app.use("/api/*", cors());
 // Auth middleware for specific Cloudflare AI proxy routes
 app.use("/api/cf/text-to-image/*", authMiddleware);
 app.use("/api/cf/text-to-speech/*", authMiddleware);
-app.use("/api/upload/*", authMiddleware); // Added auth for generic upload
 
 // Register routes
 app.route("/api/gemini", GeminiApiRoute);

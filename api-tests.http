@@ -57,3 +57,22 @@ X-Auth-Guid: {{authGuid}}
 # @prompt audioId Enter the Audio ID from the generation step
 GET {{baseUrl}}/api/cf/text-to-speech/{{audioId}}
 X-Auth-Guid: {{authGuid}}
+
+###
+# Generic Base64 Upload
+###
+
+# @name genericUploadPost
+POST {{hostname}}/api/upload
+Content-Type: application/json
+X-Auth-Guid: {{authGuid}}
+
+{
+  "data": "SGVsbG8gV29ybGQh", // "Hello World!" as base64
+  "mimeType": "text/plain"
+}
+
+###
+# @name getUploadedAsset
+# @prompt assetId Please enter the assetId from the genericUploadPost response:
+GET {{hostname}}/api/upload/{{assetId}}

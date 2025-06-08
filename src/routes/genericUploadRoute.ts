@@ -1,9 +1,10 @@
 import { Hono } from "hono";
 import { GenericUploadService, GenericUploadInputs } from "../services/genericUploadService";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 const genericUploadRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
-genericUploadRoute.post("/", async (c) => {
+genericUploadRoute.post("/", authMiddleware, async (c) => {
   try {
     const service = new GenericUploadService(c.env);
     const inputs = await c.req.json<GenericUploadInputs>();
