@@ -6,6 +6,7 @@ import { CfTextToImageRoute } from "./routes/cfTextToImageRoute";
 import { authMiddleware } from "./middleware/authMiddleware";
 import { CfTextToSpeechRoute } from "./routes/cfTextToSpeechRoute";
 import genericUploadRoute from "./routes/genericUploadRoute"; // Added import
+import { listMediaRoute } from "./routes/listMediaRoute"; // Import the new media list route
 
 const app = new Hono<{ Bindings: CloudflareBindings }>();
 
@@ -22,6 +23,7 @@ app.route("/api/replicate", ReplicateApiRoute);
 app.route("/api/cf/text-to-image", CfTextToImageRoute);
 app.route("/api/cf/text-to-speech", CfTextToSpeechRoute);
 app.route("/api/upload", genericUploadRoute); // Added route for generic upload
+app.route("/api/media", listMediaRoute); // Add the new media list route
 app.get("/", (c) => {
   return c.text("Hello from Asset Cache Proxy! Visit /api for API routes.");
 });
