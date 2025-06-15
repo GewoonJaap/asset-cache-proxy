@@ -4,10 +4,6 @@ export const listMediaRoute = new Hono<{ Bindings: CloudflareBindings }>();
 
 listMediaRoute.get('/', async (c) => {
 
-    if (!contentType) {
-        return c.text('Missing contentType query parameter', 400);
-    }
-
     const env = c.env;
 
     try {
