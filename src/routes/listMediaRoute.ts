@@ -13,7 +13,7 @@ listMediaRoute.get('/', async (c) => {
             include: ['httpMetadata'], // To get ContentType from metadata
         };
 
-        const listed = await env.AI_CACHE_BUCKET.list(listOptions);
+        const listed = await env.MEDIA_BUCKET.list(listOptions); // Changed AI_CACHE_BUCKET to MEDIA_BUCKET
         let objects = listed.objects;
 
         // Note: R2 .list() is eventually consistent and may not return all objects
@@ -23,7 +23,7 @@ listMediaRoute.get('/', async (c) => {
         let cursor = listed.cursor;
 
         while (truncated) {
-            const nextListed = await env.AI_CACHE_BUCKET.list({
+            const nextListed = await env.MEDIA_BUCKET.list({ // Changed AI_CACHE_BUCKET to MEDIA_BUCKET
                 ...listOptions,
                 cursor: cursor,
             });
