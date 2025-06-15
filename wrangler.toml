@@ -24,6 +24,7 @@ mode = "smart"
 # - https://developers.cloudflare.com/workers/configuration/secrets/
 [vars]
 AI_GATEWAY_ID = "asset-cache-gateway"
+R2_MEDIA_BASE_URL = "ai-cache-bucket.mrproper.dev"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#workers-ai
